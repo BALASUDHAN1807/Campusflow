@@ -1,0 +1,209 @@
+// CAMPUSFLOW — Smart Fair Queue Database Schema
+// PostgreSQL + Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum UserRole {
+  STUDENT
+  STAFF
+}
+
+enum QueueStatus {
+  OPEN
+  PAUSED
+  CLOSED
+}
+
+enum TokenStatus {
+  WAITING
+  HOLD
+  SERVING
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum SmartHoldStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum QueueEventType {
+  JOINED
+  HOLD_DECLARED
+  HOLD_EXPIRED
+  HOLD_CANCELLED
+  SKIPPED
+  MOVED_TO_TAIL
+  SERVING
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+  QUEUE_PAUSED
+  QUEUE_RESUMED
+}
+
+enum NotificationType {
+  TURN_APPROACHING
+  SMART_HOLD_ACTIVATED
+  SKIPPED
+  HOLD_EXPIRED
+  MOVED_TO_TAIL
+  QUEUE_UPDATE
+  SYSTEM
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  tokens        QueueToken[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Service {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  description String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  queues Queue[]
+
+  @@index([active])
+}
+
+model Queue {
+  id              String      @id @default(uuid()) @db.Uuid
+  serviceId       String      @db.Uuid
+  status          QueueStatus @default(OPEN)
+  maxSkips        Int         @default(5)
+  minLeadTime     Int         @default(10) // in minutes
+  maxHoldDuration Int         @default(60) // in minutes
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relationships
+  service Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  tokens  QueueToken[]
+  events  QueueEvent[]
+
+  @@index([serviceId])
+  @@index([status])
+}
+
+model QueueToken {
+  id          String      @id @default(uuid()) @db.Uuid
+  queueId     String      @db.Uuid
+  userId      String      @db.Uuid
+  tokenNumber Int
+  queueOrder  Int         @default(0)
+  status      TokenStatus @default(WAITING)
+  skipCount   Int         @default(0)
+  joinedAt    DateTime    @default(now())
+  servingAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relationships
+  queue      Queue        @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  smartHolds SmartHold[]
+  events     QueueEvent[]
+
+  // Token number is unique PER QUEUE
+  @@unique([queueId, tokenNumber])
+  @@index([queueId])
+  @@index([queueOrder])
+  @@index([queueId, queueOrder])
+  @@index([status])
+  @@index([userId])
+  @@index([joinedAt])
+  @@index([queueId, status])
+}
+
+model SmartHold {
+  id        String          @id @default(uuid()) @db.Uuid
+  tokenId   String          @db.Uuid
+  startTime DateTime
+  endTime   DateTime
+  reason    String
+  status    SmartHoldStatus @default(ACTIVE)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  // Relationships
+  token QueueToken @relation(fields: [tokenId], references: [id], onDelete: Cascade)
+
+  @@index([tokenId])
+  @@index([status])
+  @@index([startTime])
+  @@index([endTime])
+}
+
+model QueueEvent {
+  id        String         @id @default(uuid()) @db.Uuid
+  queueId   String         @db.Uuid
+  tokenId   String?        @db.Uuid
+  eventType QueueEventType
+  metadata  Json?
+  createdAt DateTime       @default(now())
+
+  // Relationships
+  queue Queue       @relation(fields: [queueId], references: [id], onDelete: Cascade)
+  token QueueToken? @relation(fields: [tokenId], references: [id], onDelete: SetNull)
+
+  @@index([queueId])
+  @@index([tokenId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([queueId, createdAt])
+  @@index([queueId, eventType])
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
