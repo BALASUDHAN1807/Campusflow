@@ -267,6 +267,18 @@ npm run build
 
 ## Production Deployment Guide
 
+### Vercel (single project: frontend + API)
+The repo is ready to deploy as one Vercel project. `vercel.json` builds the React app to `client/dist`, and `api/index.js` serves the Express API as a serverless function at `/api/*`, so the frontend and API share one domain (no CORS or cross-site cookie setup needed).
+
+Set these environment variables in the Vercel project:
+- `DATABASE_URL` — Supabase **pooled** connection string (port 6543, add `?pgbouncer=true`)
+- `DIRECT_URL` — Supabase **direct** connection string (port 5432), used for migrations
+- `JWT_SECRET` — a long random string
+- `JWT_EXPIRES_IN=1d` (optional)
+
+Apply migrations once from your machine: `cd server && npx prisma migrate deploy`.
+
+
 ### 1. Database Deployment (Supabase / Railway PostgreSQL)
 1. Provision a PostgreSQL instance on Supabase or Railway.
 2. Retrieve the connection string URI.

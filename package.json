@@ -2,6 +2,7 @@
   "name": "campusflow-monorepo",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "CAMPUSFLOW — Smart Fair Queue Management Platform",
   "workspaces": [
     "client",
