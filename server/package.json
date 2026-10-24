@@ -3,19 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "description": "CAMPUSFLOW Backend API Service",
-  "main": "dist/server.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit",
-    "test": "node dist/utils/test-part10-e2e.js",
-    "test:all": "node dist/utils/test-smart-hold.js && node dist/utils/test-part7-staff.js && node dist/utils/test-part8-events-notifications.js && node dist/utils/test-part9-analytics.js && node dist/utils/test-part10-e2e.js",
-    "seed": "tsx prisma/seed.ts"
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "build": "prisma generate",
+    "test": "node src/utils/test-part10-e2e.js",
+    "test:all": "node src/utils/test-smart-hold.js && node src/utils/test-part7-staff.js && node src/utils/test-part8-events-notifications.js && node src/utils/test-part9-analytics.js && node src/utils/test-part10-e2e.js",
+    "seed": "node prisma/seed.js"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
@@ -28,14 +26,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.10.2",
-    "prisma": "^6.4.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
-  }
+    "prisma": "^6.4.1"
+  },
+  "type": "module"
 }

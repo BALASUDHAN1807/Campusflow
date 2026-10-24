@@ -15,8 +15,6 @@
     "build:client": "npm run build --workspace=client",
     "build:server": "npm run build --workspace=server",
     "build": "npm run build:client && npm run build:server",
-    "typecheck": "npm run typecheck --workspace=client && npm run typecheck --workspace=server",
-    "lint": "npm run lint --workspace=client && npm run lint --workspace=server",
     "test": "npm run test --workspace=server",
     "test:all": "npm run test:all --workspace=server",
     "seed": "npm run seed --workspace=server"

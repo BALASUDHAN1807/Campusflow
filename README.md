@@ -26,8 +26,8 @@ CAMPUSFLOW introduces **Smart Hold** and **Bounded Fair-Skip**: an algorithmic, 
 
 | Component | Technology | Architectural Role |
 |---|---|---|
-| **Frontend** | React 18, Vite, TypeScript | SPA with role-based routing, real-time polling (3–5s), Framer Motion micro-animations, Recharts analytics, and isolated client-side simulator. |
-| **Backend** | Node.js, Express, TypeScript | REST API with Zod validation, centralized error handling, and transaction-safe queue engine state machine. |
+| **Frontend** | React 18, Vite, JavaScript (JSX) | SPA with role-based routing, real-time polling (3–5s), Framer Motion micro-animations, Recharts analytics, and isolated client-side simulator. |
+| **Backend** | Node.js, Express, JavaScript (ES Modules) | REST API with Zod validation, centralized error handling, and transaction-safe queue engine state machine. |
 | **Database** | PostgreSQL | Relational storage with composite uniqueness constraints, foreign keys, and indexed lookups. |
 | **ORM** | Prisma ORM (v6.4.1) | Type-safe query builder, migration manager, and interactive transaction runner (`$transaction`). |
 | **Authentication** | JWT + bcryptjs + HTTP-Only Cookies | Secure cookie-based authentication (`campusflow_token`), role-based authorization (`STUDENT`, `STAFF`), and privilege escalation prevention. |
@@ -252,19 +252,16 @@ The project contains complete automated test suites covering all 10 project phas
 # Run all automated test suites across all phases
 npm run test:all
 
-# Run TypeScript strict typecheck across client and server
-npm run typecheck
-
-# Run production build validation (Client Vite + Server tsc)
+# Run production build validation (Client Vite build + Prisma client generation)
 npm run build
 ```
 
 ### Test Coverage Highlights
-- `test-smart-hold.ts`: 18/18 test cases validating hold window bounds, time validation, multi-skip progression, and tail movement.
-- `test-part7-staff.ts`: 14/14 test cases testing Desk #01 lifecycle, pause/resume/close, and concurrent `callNext()` transactions.
-- `test-part8-events-notifications.ts`: 16/16 test cases verifying immutable audit streams, pagination, and notification delivery.
-- `test-part9-analytics.ts`: 14/14 test cases verifying server-side aggregations, KPI calculations, and simulator isolation.
-- `test-part10-e2e.ts`: 17/17 end-to-end integration tests verifying cross-role authorization, privacy barriers, and full queue cycles.
+- `test-smart-hold.js`: 18/18 test cases validating hold window bounds, time validation, multi-skip progression, and tail movement.
+- `test-part7-staff.js`: 14/14 test cases testing Desk #01 lifecycle, pause/resume/close, and concurrent `callNext()` transactions.
+- `test-part8-events-notifications.js`: 16/16 test cases verifying immutable audit streams, pagination, and notification delivery.
+- `test-part9-analytics.js`: 14/14 test cases verifying server-side aggregations, KPI calculations, and simulator isolation.
+- `test-part10-e2e.js`: 17/17 end-to-end integration tests verifying cross-role authorization, privacy barriers, and full queue cycles.
 
 ---
 
@@ -285,7 +282,7 @@ npm run build
 ### 2. Backend Deployment (Render / Railway)
 - **Root Directory**: `server`
 - **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start` (runs `node dist/server.js`)
+- **Start Command**: `npm start` (runs `node src/server.js`)
 - **Environment Variables**:
   - `NODE_ENV=production`
   - `PORT=5000` (or provider-assigned)
