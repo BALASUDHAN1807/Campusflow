@@ -315,7 +315,3 @@ npm run build
 8. **Fairness Simulator**: Open `/staff/simulator`. Run a 20-student simulation with 3 skips to demonstrate the mathematical fairness curve and queue dynamics in an isolated sandbox.
 
 ---
-
-## License
-
-This project is licensed under the MIT License — see the LICENSE file for details.
